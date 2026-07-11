@@ -192,6 +192,14 @@ def main():
 
     model.save_pretrained(out_dir)
     tokenizer.save_pretrained(out_dir)
+    # loss推移を保存（記事のグラフ用）
+    with open(os.path.join(out_dir, "loss_history.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(trainer.state.log_history, f, ensure_ascii=False, indent=2)
+    losses = [e["loss"] for e in trainer.state.log_history if "loss" in e]
+    if losses:
+        print(f"loss: 開始 {losses[0]:.3f} → 最終 {losses[-1]:.3f} "
+              f"({len(losses)} steps)")
     with open(os.path.join(out_dir, "train_config.json"), "w",
               encoding="utf-8") as f:
         json.dump({"model": model_name, "num_samples": len(records),

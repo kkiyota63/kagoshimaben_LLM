@@ -1,0 +1,177 @@
+{
+  "run": "llmjp-full",
+  "model": "llm-jp/llm-jp-3-7.2b-instruct3",
+  "num_samples": 105,
+  "epochs": 3,
+  "steps_per_epoch": 14,
+  "history": [
+    {
+      "step": 1,
+      "loss": 5.058
+    },
+    {
+      "step": 2,
+      "loss": 4.857
+    },
+    {
+      "step": 3,
+      "loss": 4.79
+    },
+    {
+      "step": 4,
+      "loss": 3.694
+    },
+    {
+      "step": 5,
+      "loss": 3.497
+    },
+    {
+      "step": 6,
+      "loss": 3.019
+    },
+    {
+      "step": 7,
+      "loss": 2.953
+    },
+    {
+      "step": 8,
+      "loss": 2.837
+    },
+    {
+      "step": 9,
+      "loss": 2.483
+    },
+    {
+      "step": 10,
+      "loss": 2.274
+    },
+    {
+      "step": 11,
+      "loss": 1.931
+    },
+    {
+      "step": 12,
+      "loss": 2.169
+    },
+    {
+      "step": 13,
+      "loss": 2.403
+    },
+    {
+      "step": 14,
+      "loss": 1.655
+    },
+    {
+      "step": 15,
+      "loss": 1.621
+    },
+    {
+      "step": 16,
+      "loss": 2.023
+    },
+    {
+      "step": 17,
+      "loss": 1.66
+    },
+    {
+      "step": 18,
+      "loss": 1.542
+    },
+    {
+      "step": 19,
+      "loss": 1.649
+    },
+    {
+      "step": 20,
+      "loss": 1.756
+    },
+    {
+      "step": 21,
+      "loss": 1.686
+    },
+    {
+      "step": 22,
+      "loss": 1.566
+    },
+    {
+      "step": 23,
+      "loss": 1.585
+    },
+    {
+      "step": 24,
+      "loss": 1.474
+    },
+    {
+      "step": 25,
+      "loss": 1.787
+    },
+    {
+      "step": 26,
+      "loss": 1.587
+    },
+    {
+      "step": 27,
+      "loss": 2.066
+    },
+    {
+      "step": 28,
+      "loss": 1.348
+    },
+    {
+      "step": 29,
+      "loss": 1.389
+    },
+    {
+      "step": 30,
+      "loss": 1.878
+    },
+    {
+      "step": 31,
+      "loss": 1.64
+    },
+    {
+      "step": 32,
+      "loss": 1.511
+    },
+    {
+      "step": 33,
+      "loss": 1.317
+    },
+    {
+      "step": 34,
+      "loss": 1.225
+    },
+    {
+      "step": 35,
+      "loss": 1.278
+    },
+    {
+      "step": 36,
+      "loss": 1.201
+    },
+    {
+      "step": 37,
+      "loss": 1.392
+    },
+    {
+      "step": 38,
+      "loss": 1.43
+    },
+    {
+      "step": 39,
+      "loss": 1.294
+    },
+    {
+      "step": 40,
+      "loss": 1.699
+    },
+    {
+      "step": 41,
+      "loss": 1.683
+    },
+    {
+      "step": 42,
+      "loss": 1.191
+    }
+  ]
+}
