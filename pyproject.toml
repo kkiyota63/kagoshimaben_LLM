@@ -1,0 +1,20 @@
+[project]
+name = "kagoshimaben"
+version = "0.1.0"
+description = "鹿児島弁LLM 自由研究 — QLoRAファインチューニング"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "torch>=2.4.0",
+    "transformers>=4.51.0",
+    "datasets>=2.20.0",
+    "peft>=0.11.0",
+    "bitsandbytes>=0.43.0",
+    "accelerate>=0.30.0",
+    "sentencepiece",
+    "protobuf",
+]
+
+[tool.uv]
+# 学習はCUDA付きLinux (WSL2含む) で行う前提。
+# macOSを除外することで bitsandbytes 等の解決エラーを防ぐ
+environments = ["sys_platform == 'linux'"]

@@ -1,0 +1,12 @@
+# GPU機 (RTX 3090 / CUDA) 用の依存パッケージ
+# torch は CUDA 版を先に入れること（TRAINING.md 参照）
+transformers>=4.51.0
+datasets>=2.20.0
+peft>=0.11.0
+bitsandbytes>=0.43.0
+accelerate>=0.30.0
+sentencepiece
+protobuf
+
+# 任意（入れると学習が速く・省メモリになる。入らなくても動く）
+# unsloth
