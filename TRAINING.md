@@ -2,6 +2,11 @@
 
 このフォルダを丸ごとGPU機にコピーすれば学習できる。所要時間の目安つき。
 
+> **一括実行**: セットアップ（§1）が済んでいれば `./run_all.sh` で
+> 4モデル分の「事前知識調査→before評価→学習→after評価→サマリー生成」が
+> 全自動で走る（初回はモデルDL込みで数時間）。途中で止めても再実行で続きから。
+> 個別に手を動かしたい場合のみ以下の§2〜5を使う。
+
 ## 0. 前提
 
 - **OS**: Linux推奨。WindowsならWSL2上のUbuntuで実行（bitsandbytesがWindowsネイティブだと不安定なため）
@@ -70,6 +75,38 @@ uv run python infer.py --model llm-jp --adapter outputs/llmjp-full \
 before/after の Markdown を並べれば、そのまま記事の素材になる。
 `eval_prompts.txt` の前半は学習データにある質問（暗記の確認）、
 後半は無い質問（汎化の確認）。**後半で鹿児島弁が出るかが勝負どころ。**
+
+## 実験方法の注記: systemプロンプトについて
+
+第3回までの実験は学習・推論とも「あなたは鹿児島弁で話すアシスタントです」の
+systemプロンプト付きで行った（＝学習効果とプロンプト効果が混ざっている）。
+**第4回以降は、学習・推論ともsystemプロンプトなしがデフォルト**。
+これにより before（完全な標準語）/ after（方言）の差分＝純粋な学習効果になる。
+旧方式で比較したい場合のみ `train.py --keep-system` / `infer.py --with-system`。
+
+## 5.5 実験③: モデル間比較 —「事前知識」仮説の検証
+
+仮説: ベースモデルが事前学習で知っている方言語彙（おやっとさあ等）は少数例のFTで
+引き出せるが、知らない語彙（いたっおじゃんせ等）は定着しない。
+
+```bash
+# ステップ1: 各ベースモデル（学習前）の方言知識を調査
+uv run python infer.py --model llm-jp    --prompts vocab_check.txt --save results_vocab_llmjp_base.md
+uv run python infer.py --model qwen3     --prompts vocab_check.txt --save results_vocab_qwen3_base.md
+uv run python infer.py --model sarashina --prompts vocab_check.txt --save results_vocab_sarashina_base.md
+uv run python infer.py --model elyza     --prompts vocab_check.txt --save results_vocab_elyza_base.md
+
+# ステップ2: 同じデータ・同じ設定で各モデルをFT
+uv run python train.py --model sarashina --out outputs/sarashina-full
+uv run python train.py --model elyza     --out outputs/elyza-full
+
+# ステップ3: FT後の汎化評価（eval_prompts.txt）
+uv run python infer.py --model sarashina --adapter outputs/sarashina-full --save results_sarashina_after.md
+uv run python infer.py --model elyza     --adapter outputs/elyza-full     --save results_elyza_after.md
+```
+
+「ベースが知っていた語彙 → FT後に使えるようになったか」の対応表を作れば、
+仮説の検証になる。sarashina（3B）は他より小さいので学習も速い（数分）。
 
 ## 6. うまくいかないとき
 

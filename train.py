@@ -19,6 +19,8 @@ import os
 MODEL_ALIASES = {
     "qwen3": "Qwen/Qwen3-8B",
     "llm-jp": "llm-jp/llm-jp-3-7.2b-instruct3",
+    "sarashina": "sbintuitions/sarashina2.2-3b-instruct-v0.1",
+    "elyza": "elyza/Llama-3-ELYZA-JP-8B",
 }
 
 LORA_TARGET_MODULES = [
@@ -46,6 +48,9 @@ def parse_args():
                    help="使うレコードIDをカンマ区切りで指定 (例: kb-000,kb-040)")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--backend", choices=["auto", "unsloth", "hf"], default="auto")
+    p.add_argument("--keep-system", action="store_true",
+                   help="systemプロンプトを残して学習する（デフォルトは除去。"
+                        "学習効果とプロンプト効果を分離するため）")
     return p.parse_args()
 
 
@@ -145,11 +150,23 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
 
     # chat template でメッセージ列を1本のテキストに変換
-    texts = [
-        tokenizer.apply_chat_template(
-            r["messages"], tokenize=False, add_generation_prompt=False)
-        for r in records
-    ]
+    # （systemロール非対応のテンプレートでは、systemを先頭userに合体させる）
+    def to_text(messages):
+        if not args.keep_system and messages and messages[0]["role"] == "system":
+            messages = messages[1:]
+        try:
+            return tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=False)
+        except Exception:
+            if messages and messages[0]["role"] == "system" and len(messages) > 1:
+                merged = ([{"role": "user",
+                            "content": messages[0]["content"] + "\n\n"
+                            + messages[1]["content"]}] + messages[2:])
+                return tokenizer.apply_chat_template(
+                    merged, tokenize=False, add_generation_prompt=False)
+            raise
+
+    texts = [to_text(r["messages"]) for r in records]
     print("--- 整形済みサンプル (1件目) ---")
     print(texts[0][:500])
     print("-------------------------------")

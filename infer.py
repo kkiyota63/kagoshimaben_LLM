@@ -17,6 +17,8 @@ import os
 MODEL_ALIASES = {
     "qwen3": "Qwen/Qwen3-8B",
     "llm-jp": "llm-jp/llm-jp-3-7.2b-instruct3",
+    "sarashina": "sbintuitions/sarashina2.2-3b-instruct-v0.1",
+    "elyza": "elyza/Llama-3-ELYZA-JP-8B",
 }
 
 SYSTEM_PROMPT = "あなたは鹿児島弁で話すアシスタントです。"
@@ -30,8 +32,9 @@ def parse_args():
     p.add_argument("--max-new-tokens", type=int, default=256)
     p.add_argument("--temperature", type=float, default=0.7)
     p.add_argument("--save", default=None, help="結果を書き出すMarkdownファイル")
-    p.add_argument("--no-system", action="store_true",
-                   help="systemプロンプトを付けない（素の比較用）")
+    p.add_argument("--with-system", action="store_true",
+                   help="systemプロンプトを付けて推論する（デフォルトは付けない。"
+                        "学習効果とプロンプト効果を分離するため）")
     return p.parse_args()
 
 
@@ -66,8 +69,8 @@ def main():
     lines = [f"# 推論結果: {label}", ""]
 
     for i, q in enumerate(prompts, 1):
-        messages = [] if args.no_system else [
-            {"role": "system", "content": SYSTEM_PROMPT}]
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}] \
+            if args.with_system else []
         messages.append({"role": "user", "content": q})
         try:
             # Qwen3 は enable_thinking=False で思考モードを切る
@@ -77,6 +80,16 @@ def main():
         except TypeError:
             text = tokenizer.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True)
+        except Exception:
+            # systemロール非対応テンプレート: systemを先頭userに合体
+            if messages and messages[0]["role"] == "system" and len(messages) > 1:
+                merged = ([{"role": "user",
+                            "content": messages[0]["content"] + "\n\n"
+                            + messages[1]["content"]}] + messages[2:])
+                text = tokenizer.apply_chat_template(
+                    merged, tokenize=False, add_generation_prompt=True)
+            else:
+                raise
         inputs = tokenizer(text, return_tensors="pt").to(model.device)
         with torch.no_grad():
             out = model.generate(
